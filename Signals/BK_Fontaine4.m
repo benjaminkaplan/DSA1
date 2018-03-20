@@ -56,7 +56,7 @@ k6 = 1;
 figure;
 stem(t6,h6);
 fNyq6 = (150e6)/2;
-[freqresp,angresp] = freqz(b,a,linspace(0,fNyq6,1000));
+[freqresp,angresp] = freqz(b6,a6,linspace(0,fNyq6,1000));
 figure;
 subplot(2,1,1);
 plot(mag2db(abs(freqresp)));
