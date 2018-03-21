@@ -1,5 +1,6 @@
 %% Benjamin Kaplan - Problem Set IV
 close all;
+ellipfilthw;
 
 %% Analog Filter
 fprintf('Order of analog filter is %d\n', filtord(b,a));
@@ -63,7 +64,7 @@ plot(mag2db(abs(freqresp)));
 subplot(2,1,2);
 plot(rad2deg(angle(freqresp)));
 
-X = Xt(0:50)
+X = Xt(0:50);
 Y = filter(b6,a6,X);
 figure;
 subplot(2,1,1);
@@ -79,6 +80,3 @@ title('X(t) continuous');
 subplot(2,1,2);
 plot(Y);
 title('Y(t) Continuous');
-
-
-
