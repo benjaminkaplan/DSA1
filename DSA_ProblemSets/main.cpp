@@ -6,6 +6,7 @@
 using namespace std;
 
 bool emptyListFlag = false;
+bool addingListFlag = false;
 
 template<class T>
 class SimpleList{
@@ -29,7 +30,7 @@ class SimpleList{
     string getName(){return this->name;}
 
     SimpleList<T>():name("s1"), top(new Node) , bottom(new Node){top->next = bottom;bottom->next = top;} //Constructorc
-    SimpleList<T>(string& str): top(new Node) , bottom(new Node){name = str; top->next = bottom; bottom->next = top;}
+    SimpleList<T>(string& str): name(str), top(new Node) , bottom(new Node){top->next = bottom; bottom->next = top;}
   private:
     string name;
 };
@@ -72,9 +73,7 @@ T SimpleList<T>::removeTop(){
 template<class T>
 class Stack: public SimpleList<T>{
   public:
-    Stack<T>(string& str){
-      SimpleList<T>();//==========================FIGURE OUT HOW TO PASS str TO CONTRUCTOR
-    }
+    Stack<T>(string& str):SimpleList<T>(str){}
     void push(const T t){
       this->SimpleList<T>::insertTop(t);
     }
@@ -93,9 +92,7 @@ class Stack: public SimpleList<T>{
 template<class T>
 class Queue: public SimpleList<T>{
   public:
-    Queue<T>(string &str){
-      SimpleList<T>();//SAME AS NOTE ABOVE FOR STACKS!!!!!!!
-    }
+    Queue<T>(string&str): SimpleList<T>(str){}
     void push(const T t){
       this->SimpleList<T>::insertBottom(t);
     }
@@ -115,10 +112,11 @@ class Queue: public SimpleList<T>{
 template<class T>
 SimpleList<T>* findList(list<SimpleList<T> *>& l,string& s){
   typename list<SimpleList<T>* >::iterator SL = l.begin();
-  cout<<"name is "<<(*SL)->getName()<<endl;
-  cout<<"In the findList() function"<<endl;
+  //cout<<"size of this god forsaken list: "<<l.size()<<endl;
+  //cout<<"In the findList() function"<<endl;
   string temp;
   while(SL != l.end()){
+    //cout<<(*SL)->getName()<<endl;
     if(!s.compare((*SL)->getName()))
         return (*SL);
     SL++;
@@ -126,21 +124,40 @@ SimpleList<T>* findList(list<SimpleList<T> *>& l,string& s){
   return NULL;
 }
 
-void createList(string& line, list<SimpleList<int> *> listSLi, list<SimpleList<double> *> listSLd, list<SimpleList<string> *> listSLs){
+void createList(string& line, list<SimpleList<int> *>& listSLi, list<SimpleList<double> *>& listSLd, list<SimpleList<string> *>& listSLs){
   stringstream ss(line);
   string iter;
   string name;
   string type;
   ss>>iter;
-  name = iter; cout<<name<<endl;
+  name = iter; //cout<<name<<endl;
   if(!line.compare(0,1,"i")){
     ss>>iter;
-    type = iter; cout<<iter<<endl;
+    type = iter; //cout<<iter<<endl;
     if(!type.compare(0,5,"stack")){
-      cout<<"this is a stack"<<endl;
+      //cout<<"this is a stack"<<endl;
       SimpleList<int> *pSLi;
+      SimpleList<int>* check = findList(listSLi,name);
+      if(listSLi.size() != 0 && check!=NULL){
+        cout<<"ERROR: This name already exists!"<<endl;
+        return;
+      }
       pSLi = new Stack<int>(name);
-      listSLi.push_front(pSLi);
+      listSLi.push_front(pSLi); //cout<<"push done, size: "<<listSLi.size()<<endl;
+    }
+    if(!type.compare(0,5,"queue")){
+      //cout<<"this is a queue"<<endl;
+      SimpleList<int> *pSLi;
+      SimpleList<int>* check = findList(listSLi,name);
+      if(listSLi.size() != 0 && check!=NULL){
+        cout<<"ERROR: This name already exists!"<<endl;
+        return;
+      }
+      //cout<<"name is: "<<name<<endl;
+      pSLi = new Queue<int>(name);
+
+      listSLi.push_front(pSLi);//cout<<"push done, size: "<<listSLi.size()<<endl;
+      //cout<<"name of value pushed is: "<<listSLi.front()->getName()<<endl;
     }
   }
 }
@@ -148,7 +165,7 @@ void createList(string& line, list<SimpleList<int> *> listSLi, list<SimpleList<d
 
 int main(){
   cout<<"hello world\n"<<endl; //string str = "hello";
-  string str2 = "hello";
+  /*string str2 = "hello";
   list<SimpleList<int> *> listSLi; // all integer stacks and queues
   list<SimpleList<double> *> listSLd; // all double stacks and queues
   list<SimpleList<string> *> listSLs; // all string stacks and queues
@@ -165,14 +182,17 @@ int main(){
   listSLi.push_front(s3);
   string str3 = "s1";
   findList(listSLi, str3);
-  /*
+  */
+  list<SimpleList<int> *> listSLi; // all integer stacks and queues
+  list<SimpleList<double> *> listSLd; // all double stacks and queues
+  list<SimpleList<string> *> listSLs; // all string stacks and queues
   ifstream input;
   input.open("commands.txt");
   string str;
   string line;
   while(getline(input,line) ){
+    cout<<"PROCESSING COMMANDS: "<<line<<endl;
     if(!(line.compare(0,6,"create"))) { //confirms presence of CREATE command
-      //cout<<"create found"<<endl;
       string temp = line.substr(7,string::npos);
       createList(temp, listSLi, listSLd,listSLs);
       continue;
@@ -184,7 +204,7 @@ int main(){
       //cout<<"pop found"<<endl;
     }
   }
-  */
+
 
   return 0;
 }
