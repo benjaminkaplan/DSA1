@@ -232,10 +232,9 @@ int main(){
   string line;
   //getline(input,line);
   while(getline(input,line)){
-    //if(line != string())
-      //cout<<endl;
-    if(!line.compare("\n"))
-      cout<<"this is a newline=============================="<<endl;
+    if(!line.compare("")){ // prevents processing of empty line at end of file
+      break;
+    }
     cout<<"PROCESSING COMMAND: "<<line<<endl; // Every line is always written back out first
     stringstream ss(line);
     string iter;
@@ -261,9 +260,7 @@ int main(){
     }
     
   }
-  //ofstream real;
-  //real.open(outfile);
-  //while(out>>real){} 
+  cout<<""<<endl; //matches number of bytes for EOF
   out.close();
 
   return 0;
