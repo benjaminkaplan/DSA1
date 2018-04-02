@@ -56,12 +56,14 @@ void SimpleList<T>::insertBottom(const T t){ // inserts node at bottom of list
   bottom->next = node;
 }
 template<class T>
-T SimpleList<T>::removeTop(){ // removes node from top of list
-  if(top->next == bottom){    //used for both versions of pop() - both are identical
-    emptyListFlag = true;     // returns the data stored in the popped node
-    bottom->next = top;
-  }
+T SimpleList<T>::removeTop(){ // Removes node from top of list.
   T temp = top->next->data;
+  if(top->next == bottom){    // Used for both versions of pop() - both are identical
+    emptyListFlag = true;     // Returns the data stored in the popped node
+    bottom->next = top;
+    return temp;
+  }
+
   top->next = top->next->next;
   return temp;
 }
@@ -166,7 +168,7 @@ void createList(string& name, string& value,list<SimpleList<int> *>& listSLi, li
 void pushList(string& name, string& value,list<SimpleList<int> *>& listSLi, list<SimpleList<double> *>& listSLd, list<SimpleList<string> *>& listSLs){
   if(!name.compare(0,1,"i")){                                 // Pushes for each given data type and name
     SimpleList<int>* SLi = findList(listSLi,name);
-    if(SLi);{    //checks that list of given name exists
+    if(SLi){    //checks that list of given name exists
       SLi->push(stoi(value)); //converts string of value to correct data type and pushes
       return;
     }
@@ -191,21 +193,21 @@ void pushList(string& name, string& value,list<SimpleList<int> *>& listSLi, list
 void popList(string& name, list<SimpleList<int> *>& listSLi, list<SimpleList<double> *>& listSLd, list<SimpleList<string> *>& listSLs){
   if(!name.compare(0,1,"i")){                               //Very similar to pushList above, uses same strategy for pops
     SimpleList<int>* SLi = findList(listSLi,name);          // output of pop is written out in pop() function
-    if(SLi && !emptyListFlag){
+    if(SLi){
       SLi->pop();
       return;
     }
   }
   if(!name.compare(0,1,"d")){
     SimpleList<double>* SLd = findList(listSLd,name);
-    if(SLd && !emptyListFlag){
+    if(SLd){
       SLd->pop();
       return;
     }
   }
   if(!name.compare(0,1,"s")){
     SimpleList<string>* SLs = findList(listSLs,name);
-    if(SLs && !emptyListFlag){
+    if(SLs){
         SLs->pop();
         return;
     }
@@ -260,7 +262,6 @@ int main(){
     }
     
   }
-  cout<<""<<endl; //matches number of bytes for EOF
   out.close();
 
   return 0;
