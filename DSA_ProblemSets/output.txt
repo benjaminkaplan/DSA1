@@ -76,4 +76,3 @@ PROCESSING COMMAND: pop dHelloWorld
 Value popped: 3.14
 PROCESSING COMMAND: pop dHelloWorld
 ERROR: This list is empty!
-

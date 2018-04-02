@@ -50,3 +50,35 @@ pop sR2D2
 pop dHelloWorld
 pop dHelloWorld
 pop dHelloWorld
+create dQueue queue
+create iStack stack
+create sQueue queue
+pop sQueue
+pop sQueue
+push sQueue this
+push sQueue that
+pop sQueue
+push sQueue the
+push sQueue other
+pop sQueue
+pop dQueue
+push dQueue 3.5
+push dQueue 4
+push dQueue 89.2
+pop dQueue
+pop iStack
+pop iStack
+push iStack 4
+push iStack 12
+pop iStac
+pop dQueue
+pop dQueue
+pop dQueue
+pop dQueue
+pop dQueue
+push iStay 101
+push slol 20
+push sQueue 10
+pop sQueue
+pop sQueue
+pop sQueue
