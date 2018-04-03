@@ -63,7 +63,6 @@ T SimpleList<T>::removeTop(){ // Removes node from top of list.
     bottom->next = top;
     return temp;
   }
-
   top->next = top->next->next;
   if(top->next == bottom){
     bottom->next = top;
@@ -191,7 +190,7 @@ void pushList(string& name, string& value,list<SimpleList<int> *>& listSLi, list
     }
   }
   cout<<"ERROR: This name does not exist!"<<endl; // If the SL* pointer is NULL every time, then the list does not exist
-}
+}// END OF pushList()
 
 void popList(string& name, list<SimpleList<int> *>& listSLi, list<SimpleList<double> *>& listSLd, list<SimpleList<string> *>& listSLs){
   if(!name.compare(0,1,"i")){                               //Very similar to pushList above, uses same strategy for pops
@@ -216,8 +215,7 @@ void popList(string& name, list<SimpleList<int> *>& listSLi, list<SimpleList<dou
     }
   }
   cout<<"ERROR: This name does not exist!"<<endl;
-}
-
+}//END OF popList()
 
 int main(){
   string infile;
