@@ -65,6 +65,9 @@ T SimpleList<T>::removeTop(){ // Removes node from top of list.
   }
 
   top->next = top->next->next;
+  if(top->next == bottom){
+    bottom->next = top;
+  }
   return temp;
 }
 
