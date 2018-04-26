@@ -126,20 +126,17 @@ int main() {
 // You may add global variables, functions, and/or
 // class defintions here if you wish.
 
+
+//Data* col3arr[110000*sizeof(Data*)];
+int indices[128];
+Data* col3chars[110000*sizeof(Data*)][128];
+Data* col2chars[110000*sizeof(Data*)][128];
 void sortDataList(list<Data *> &l, int field) {
   // Fill in this function
   if( field == 1){
-	/*
-	cout<<"test++++++++++++++++++++++++++++++++++++++++++"<<endl;
-	list<Data*>::iterator t1 = l.begin(); 
-	list<Data*>::iterator t2 = t1; t2++; 
-	cout<<(*t1)->val1<<"\t\t"<<(*t2)->val1<<endl;
-	swap(*t2,*t1);
-	cout<<(*t1)->val1<<"\t\t"<<(*t2)->val1<<endl; t1++; t2++; cout<<(*t1)->val1<<"\t\t"<<(*t2)->val1<<endl;
-	cout<<"end test++++++++++++++++++++++++++++++++++++++++"<<endl;
-	*/
-    list<Data*>::iterator ahead = l.begin(); 
-    list<Data*>::iterator it = l.begin(); it++;
+    list<Data*>::iterator ahead = l.begin();
+    list<Data*>::iterator it = l.begin();
+    it++;
     for(; it != l.end(); it++){
       for(auto it2 = it; it2 != l.begin(); it2--){
         ahead = it2; ahead--;
@@ -147,9 +144,45 @@ void sortDataList(list<Data *> &l, int field) {
 			swap(*it2,*ahead);
 		else
 			break;
-		//cout<<"it2: "<<(*it2)->val1<<"\tahead"<<(*ahead)->val1<<endl;
 	  }
-	  //cout<<"new looper===================="<<endl;
     }
   }
+  else if(field == 3){
+    Data* temp = NULL;
+	while( !l.empty()){
+	  temp = l.back(); 
+	  int t = temp->val3;
+	  col3chars[indices[t]][t] = temp;
+	  indices[t]++;
+      l.pop_back();
+	}	
+	for(int c = 33; c<127; c++){
+	  int n = indices[c];
+	  for( int r = 0; r<n;r++ ){
+        l.push_back(col3chars[r][c]);
+      }	  
+	}
+  }
+  else if(field == 2){
+    unsigned i = 10;
+	unsigned j = i<<2;
+	unsigned k = j & ~(32);
+	cout<<"J: "<<j<<endl;
+	cout<<"K: "<<k<<endl;
+  /*	
+	Data* temp = NULL;
+	int index = 0;
+	while( !l.empty()){
+	  temp = l.back(); 
+	  unsigned int t = temp->val2;	  
+	  index = t & ~(2);
+	  cout<< "T is : "<<t<<"\tindex: "<<index<<endl;
+	  col3chars[indices[index]][index] = temp;
+	  indices[index]++;
+      l.pop_back();
+	}
+  */
+  } 
+    
+  
 }
