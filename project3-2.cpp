@@ -125,119 +125,78 @@ int main() {
 
 // You may add global variables, functions, and/or
 // class defintions here if you wish.
-#include <bitset>
 
-int indices0[256];
-int indices1[256];
-int indices2[256];
-int indices3[256];
-Data* col3chars[50000*sizeof(Data*)][256];
-Data* nums[1100000*sizeof(Data*)];
-  
+
+
+
+void CopyArray(Data* A[], int iBegin, int iEnd, Data* B[])
+{
+    for(int k = iBegin; k < iEnd; k++)
+        B[k] = A[k];
+}
+
+void TopDownSplitMerge(Data* B[], int iBegin, int iEnd, Data* A[])
+{
+    if(iEnd - iBegin < 2)                       // if run size == 1
+        return;                                 //   consider it sorted
+    // split the run longer than 1 item into halves
+    int iMiddle = (iEnd + iBegin) / 2;              // iMiddle = mid point
+    // recursively sort both runs from array A[] into B[]
+    TopDownSplitMerge(A, iBegin,  iMiddle, B);  // sort the left  run
+    TopDownSplitMerge(A, iMiddle,    iEnd, B);  // sort the right run
+    // merge the resulting runs from array B[] into A[]
+    TopDownMerge(B, iBegin, iMiddle, iEnd, A);
+}
+
+void TopDownMerge(Data* A[], int iBegin, int iMiddle, int iEnd, Data* B[])
+{
+    int i = iBegin, j = iMiddle;
+ 
+    // While there are elements in the left or right runs...
+    for (int k = iBegin; k < iEnd; k++) {
+        // If left run head exists and is <= existing right run head.
+        if (i < iMiddle && (j >= iEnd || A[i] <= A[j])) {
+            B[k] = A[i];
+            i = i + 1;
+        } else {
+            B[k] = A[j];
+            j = j + 1;
+        }
+    }
+}
+
+void TopDownMergeSort(Data* A[], Data* B[], int n)
+{
+    CopyArray(A, 0, n, B);           // duplicate array A[] into B[]
+    TopDownSplitMerge(B, 0, n, A);   // sort data from B[] into A[]
+}
+
+Data* A[1000];
+Data* B[1000];
 void sortDataList(list<Data *> &l, int field) {
   // Fill in this function
-
-  if(field == 2){
-	Data* temp = NULL;
-	unsigned t = 0;
-	auto it = l.begin();
-	while(it != l.end()){ // First pass, remove from list
-	  temp = (*it);
-	  t = (temp->val2);
-	  t = t & (255);
-	  col3chars[indices3[t]][t] = temp;
-	  indices3[t]++;
-      it++;
-	}
-    int count = 0;
-	for(int i = 0 ; i < 256; i++){ // Drop into holder array
-	  int n = indices3[i];
-      for(int j = 0; j<n; j++){	
-	    nums[count] = col3chars[j][i];  
-		count++;
-	  }  
-    }
-	for(int q = 0; q< count; q++){ // 2nd pass
-	  temp = nums[q];
-      t = ((temp->val2)>>8) & 255;
-	  col3chars[indices2[t]][t] = temp;
-	  indices2[t]++;
-	}
-	count = 0;
-	for(int i = 0 ; i < 256; i++){ // return to holder array #2
-	  int n = indices2[i];
-      for(int j = 0; j<n; j++){	
-	    nums[count] = col3chars[j][i];  
-		count++;
-	  }  
-    }	
-	for(int q = 0; q< count; q++){ // 3rd pass
-	  temp = nums[q];
-      t = ((temp->val2)>>(16)) & 255;
-	  col3chars[indices1[t]][t] = temp;
-	  indices1[t]++;
-	}
-	count = 0;
-	for(int i = 0 ; i < 256; i++){ // return to holder array #3
-	  int n = indices1[i];
-      for(int j = 0; j<n; j++){	
-	    nums[count] = col3chars[j][i];  
-		count++;
-	  }  
-    }
-	for(int q = 0; q< count; q++){ // 4th pass
-	  temp = nums[q];
-      t = ((temp->val2)>>(24)) & 255;
-	  col3chars[indices0[t]][t] = temp;
-	  indices0[t]++;
-	}
-	count = 0;
-	it = l.begin();
-	for(int i = 0 ; i < 256; i++){ // return to holder array (list) #4
-	  int n = indices0[i];
-      for(int j = 0; j<n; j++){	
-	    (*it) = col3chars[j][i];
-		it++;
-	  }  
-    }
-	  
+  if (field==4){
 	
-  
-  }
-
-  else if( field == 1){
-    list<Data*>::iterator ahead = l.begin();
-    list<Data*>::iterator it = l.begin();
-    it++;
-    for(; it != l.end(); it++){
-      for(auto it2 = it; it2 != l.begin(); it2--){
-        ahead = it2; ahead--;
-		if( (*it2)->val1 < (*ahead)->val1)
-			swap(*it2,*ahead);
-		else
-			break;
-	  }
+	auto it  = l.begin();
+    int count = 0;
+	while(it != l.end() ){	
+	  A[count] = (*it);
+	  //cout<<(A[count]->val4)<<endl;
+	  //B[count] = (*it);
+	  count++;
+	  it++;
     }
-  }
-  else if(field == 3){
-    Data* temp = NULL;
-	auto it = l.begin();
-	while( it != l.end()){
-	  temp = (*it);
-	  int t = temp->val3;
-	  col3chars[indices3[t]][t] = temp;
-	  indices3[t]+=1;
-      it++;
-	}
-	it = l.begin();
-    for(int i = 33 ; i < 127; i++){
-	  int n = indices3[i];
-      for(int j = 0; j<n; j++){	
-	    (*it) = col3chars[j][i];
-        it++;		
-	  }  
-    }
-  }
-   
+	
+	TopDownMergeSort(A, B, l.size() );
+	//for( int q = 0 ; q < count; q++)
+		//cout<<(A[q]->val4)<<endl;
+	for( int q = 0 ; q < count; q++)
+		cout<<"the "<<(B[q]->val4)<<endl;
   
+  }// END OF CASE 4
 }
+
+
+
+
+
