@@ -125,14 +125,84 @@ int main() {
 
 // You may add global variables, functions, and/or
 // class defintions here if you wish.
+#include <bitset>
 
+  int indices0[256];
+  int indices1[256];
+  int indices2[256];
+  int indices3[256];
+  Data* col3chars[50000*sizeof(Data*)][256];
+  Data* nums[1100000*sizeof(Data*)];
 
-//Data* col3arr[110000*sizeof(Data*)];
-int indices[128];
-Data* col3chars[110000*sizeof(Data*)][128];
-Data* col2chars[110000*sizeof(Data*)][128];
 void sortDataList(list<Data *> &l, int field) {
   // Fill in this function
+
+  if(field == 2){
+	Data* temp = NULL;
+	unsigned t = 0;
+	while( !l.empty()){ // First pass, remove from list
+	  temp = l.front();
+	  t = (temp->val2);
+	  t = t & (255);
+	  col3chars[indices3[t]][t] = temp;
+	  indices3[t]++;
+      l.pop_front();
+	}
+    int count = 0;
+	for(int i = 0 ; i < 256; i++){ // Drop into holder array
+	  int n = indices3[i];
+      for(int j = 0; j<n; j++){	
+	    nums[count] = col3chars[j][i];  
+		count++;
+	  }  
+    }
+	for(int q = 0; q< count; q++){ // 2nd pass
+	  temp = nums[q];
+      t = ((temp->val2)>>(8)) & 255;
+	  col3chars[indices2[t]][t] = temp;
+	  indices2[t]++;
+	}
+	count = 0;
+	for(int i = 0 ; i < 256; i++){ // return to holder array #2
+	  int n = indices2[i];
+      for(int j = 0; j<n; j++){	
+	    nums[count] = col3chars[j][i];  
+		count++;
+	  }  
+    }	
+	for(int q = 0; q< count; q++){ // 3rd pass
+	  temp = nums[q];
+      t = ((temp->val2)>>(16)) & 255;
+	  col3chars[indices1[t]][t] = temp;
+	  indices1[t]++;
+	}
+	count = 0;
+	for(int i = 0 ; i < 256; i++){ // return to holder array #3
+	  int n = indices1[i];
+      for(int j = 0; j<n; j++){	
+	    nums[count] = col3chars[j][i];  
+		count++;
+	  }  
+    }
+	for(int q = 0; q< count; q++){ // 4th pass
+	  temp = nums[q];
+      t = ((temp->val2)>>(24)) & 255;
+	  col3chars[indices0[t]][t] = temp;
+	  indices0[t]++;
+	}
+	count = 0;
+	for(int i = 0 ; i < 256; i++){ // return to holder array (list) #4
+	  int n = indices0[i];
+      for(int j = 0; j<n; j++){	
+	    l.push_back(col3chars[j][i]);
+	  }  
+    }
+	  //cout<<"t: "<<((temp->val2)>>(i*8))<<"\t"<<std::bitset<32>((temp->val2)>>(i*8))<<endl;;
+	  //cout<<"==============================================================="<<endl;
+	
+  
+  }
+
   if( field == 1){
     list<Data*>::iterator ahead = l.begin();
     list<Data*>::iterator it = l.begin();
@@ -150,39 +220,20 @@ void sortDataList(list<Data *> &l, int field) {
   else if(field == 3){
     Data* temp = NULL;
 	while( !l.empty()){
-	  temp = l.back(); 
+	  temp = l.front();
 	  int t = temp->val3;
-	  col3chars[indices[t]][t] = temp;
-	  indices[t]++;
-      l.pop_back();
-	}	
-	for(int c = 33; c<127; c++){
-	  int n = indices[c];
-	  for( int r = 0; r<n;r++ ){
-        l.push_back(col3chars[r][c]);
-      }	  
+	  col3chars[indices3[t]][t] = temp;
+	  indices3[t]+=1;
+      l.pop_front();
 	}
+    for(int i = 33 ; i < 127; i++){
+	  int n = indices3[i];
+      for(int j = 0; j<n; j++){	
+	    l.push_back(col3chars[j][i]);		  
+	  }  
+    }
+    cout<<"size is : "<<l.size()<<endl;	
   }
-  else if(field == 2){
-    unsigned i = 10;
-	unsigned j = i<<2;
-	unsigned k = j & ~(32);
-	cout<<"J: "<<j<<endl;
-	cout<<"K: "<<k<<endl;
-  /*	
-	Data* temp = NULL;
-	int index = 0;
-	while( !l.empty()){
-	  temp = l.back(); 
-	  unsigned int t = temp->val2;	  
-	  index = t & ~(2);
-	  cout<< "T is : "<<t<<"\tindex: "<<index<<endl;
-	  col3chars[indices[index]][index] = temp;
-	  indices[index]++;
-      l.pop_back();
-	}
-  */
-  } 
-    
+   
   
 }
