@@ -127,26 +127,96 @@ int main() {
 // class defintions here if you wish.
 #include <bitset>
 
-  int indices0[256];
-  int indices1[256];
-  int indices2[256];
-  int indices3[256];
-  Data* col3chars[50000*sizeof(Data*)][256];
-  Data* nums[1100000*sizeof(Data*)];
+int indices0[256];
+int indices1[256];
+int indices2[256];
+int indices3[256];
+Data* col3chars[50000*sizeof(Data*)][256];
+Data* nums[1100000*sizeof(Data*)];
 
+
+void Merge(Data* A[], int l , int m, int r){
+   int i,j,k;
+   int n1 = m-l+1; // num of elements in left
+   int n2 = r-m;
+   Data* L[n1]; // temporary arrays
+   Data* R[n2];
+
+    for (i = 0; i < n1; i++)
+        L[i] = A[l + i];
+    for (j = 0; j < n2; j++)
+        R[j] = A[m + 1+ j];
+ 
+
+   i = 0; // start of left array
+   j = 0;
+   k = l; // place in main array;
+   while((i<n1) && (j<n2)){
+     if( (L[i]->val4) < (R[j]->val4) ){
+       A[k] = L[i];
+       i++;
+     }
+     else{
+       A[k] = R[j];
+       j++;
+     }
+     k++;
+   }
+   while( i< n1){
+     A[k] = L[i];
+     k++;
+     i++;
+   }
+   while( j< n2){
+     A[k] = R[j];
+     k++;
+     j++;
+   }
+}
+
+void MergeSort(Data* A[], int l, int r){
+  if(l<r){
+    int m =l+ (r-l)/2;
+    MergeSort(A,l,m);
+    MergeSort(A,m+1,r);
+    Merge(A,l,m,r);
+  }
+  else 
+    return;
+}
+
+  
 void sortDataList(list<Data *> &l, int field) {
   // Fill in this function
 
+  if (field==4){
+    int count = 0;
+    auto it  = l.begin();
+    while(it != l.end() ){	
+      nums[count] = (*it);
+      count++;
+      it++;
+    }
+    MergeSort(nums,0,l.size()-1);
+    it = l.begin();
+    count = 0;
+    while(it != l.end() ){
+      (*it) = nums[count];
+      count++;
+      it++;
+    }
+  }// END OF CASE 4
   if(field == 2){
 	Data* temp = NULL;
 	unsigned t = 0;
-	while( !l.empty()){ // First pass, remove from list
-	  temp = l.front();
+	auto it = l.begin();
+	while(it != l.end()){ // First pass, remove from list
+	  temp = (*it);
 	  t = (temp->val2);
 	  t = t & (255);
 	  col3chars[indices3[t]][t] = temp;
 	  indices3[t]++;
-      l.pop_front();
+      it++;
 	}
     int count = 0;
 	for(int i = 0 ; i < 256; i++){ // Drop into holder array
@@ -158,7 +228,7 @@ void sortDataList(list<Data *> &l, int field) {
     }
 	for(int q = 0; q< count; q++){ // 2nd pass
 	  temp = nums[q];
-      t = ((temp->val2)>>(8)) & 255;
+      t = ((temp->val2)>>8) & 255;
 	  col3chars[indices2[t]][t] = temp;
 	  indices2[t]++;
 	}
@@ -191,19 +261,20 @@ void sortDataList(list<Data *> &l, int field) {
 	  indices0[t]++;
 	}
 	count = 0;
+	it = l.begin();
 	for(int i = 0 ; i < 256; i++){ // return to holder array (list) #4
 	  int n = indices0[i];
       for(int j = 0; j<n; j++){	
-	    l.push_back(col3chars[j][i]);
+	    (*it) = col3chars[j][i];
+		it++;
 	  }  
     }
-	  //cout<<"t: "<<((temp->val2)>>(i*8))<<"\t"<<std::bitset<32>((temp->val2)>>(i*8))<<endl;;
-	  //cout<<"==============================================================="<<endl;
+	  
 	
   
   }
 
-  if( field == 1){
+  else if( field == 1){
     list<Data*>::iterator ahead = l.begin();
     list<Data*>::iterator it = l.begin();
     it++;
@@ -219,20 +290,22 @@ void sortDataList(list<Data *> &l, int field) {
   }
   else if(field == 3){
     Data* temp = NULL;
-	while( !l.empty()){
-	  temp = l.front();
+	auto it = l.begin();
+	while( it != l.end()){
+	  temp = (*it);
 	  int t = temp->val3;
 	  col3chars[indices3[t]][t] = temp;
 	  indices3[t]+=1;
-      l.pop_front();
+      it++;
 	}
+	it = l.begin();
     for(int i = 33 ; i < 127; i++){
 	  int n = indices3[i];
       for(int j = 0; j<n; j++){	
-	    l.push_back(col3chars[j][i]);		  
+	    (*it) = col3chars[j][i];
+        it++;		
 	  }  
     }
-    cout<<"size is : "<<l.size()<<endl;	
   }
    
   
