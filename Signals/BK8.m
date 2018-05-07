@@ -62,4 +62,6 @@ comp = comp/9995;
 comp = sort(comp)
 corelmatEig = sort(corelmatEig);
 [U S V] = svd(A);
-Eigs? = (corelmat*U) ./ U
+Eigs = (corelmat*U) ./ U
+diff  = sort(mean(Eigs)) - sort(corelmatEig.')
+fprintf('The difference between these is very close to 0\n');
