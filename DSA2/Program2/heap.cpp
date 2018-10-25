@@ -12,7 +12,7 @@ heap::heap(int size): capacity(size){
   data.resize(capacity+1);
   mapping = new hashTable(capacity*2);
   node n;
-  n.key = INT_MIN; // place smallest element at head
+  n.key = INT_MIN; // place smallest element at head, cannot use position 0 because 0*2 = 0
   filled = 0;
   this->data[0] =n;  //sentinel node
 }
@@ -29,13 +29,11 @@ int heap::insert(const std::string &id, int key, void *pv ){
 	n->pData = pv;
 	this->mapping->hashTable::insert(id, n);
 	this->data[filled] = *n;
-	string id1 = id; //delete beofre submitting
 	this->percolateUp(this->filled); //Need to figure out percolation
 	return 0;
 }
 
 int heap::setKey(const std::string &id, int key){
-	bool* b;
 	void * temp;
 	bool up_down = false;
 	if( !(temp = this->mapping->getPointer(id)) )
@@ -66,9 +64,7 @@ int heap::deleteMin(std::string *pId , int *pKey , void *ppData ){
 	if(ppData)
 		ppData = n.pData;
 
-	//this->setKey(this->data[1].id, INT_MAX);
-	this->data[1].key = INT_MAX;
-	this->percolateDown(1);
+	this->setKey(this->data[1].id, INT_MAX); // will percolate the smallest node to the filled position
 	this->mapping->remove(this->data[filled].id);
 	filled--;
 	return 0;
@@ -85,13 +81,13 @@ int heap::remove(const std::string &id, int *pKey , void *ppData ){
 	if(ppData){
 		temp = static_cast<void*>(ppData);
 	}
-	setKey(id, INT_MIN);
+	setKey(id, INT_MIN); // setKey to smallest and do a deleteMin
 	this->deleteMin(NULL,NULL,NULL);
 	return 0;
 }
 
 void heap::percolateUp(int posCur){ 
-	while(this->data[posCur/2].key > this->data[posCur].key && posCur>0){
+	while(this->data[posCur/2].key > this->data[posCur].key && posCur>0){ // if parent > child
 		mapping->setPointer(this->data[posCur].id, &(this->data[posCur/2]));
 		mapping->setPointer(this->data[posCur/2].id, &(this->data[posCur]));
 		node temp = this->data[posCur];
@@ -104,20 +100,22 @@ void heap::percolateUp(int posCur){
 void heap::percolateDown(int posCur){ 	
 	mapping->setPointer(this->data[filled].id, &(this->data[posCur]));
 	mapping->setPointer(this->data[posCur].id, &(this->data[filled]));
-	node temp = this->data[posCur]; //switch with last position	
-	this->data[posCur] = this->data[filled];
-	this->data[filled] = temp;
+	if(this->data[posCur].key == INT_MAX){ // switch with last position if we came from deleteMin, indicated by INT_MAX 
+		node temp = this->data[posCur]; 	
+		this->data[posCur] = this->data[filled];
+		this->data[filled] = temp;
+	}
 	int child = posCur;
 	while(posCur*2 <= filled){
 		child = 2 * posCur;
-		if(this->data[child+1].id != ""){
+		if(this->data[child+1].id != ""){ // find smallest child
 			if(this->data[child+1].key < this->data[child].key)
 				child++;
 		}
-		if(this->data[child].key < this->data[posCur].key){
+		if(this->data[child].key < this->data[posCur].key){ // if child > parent
 			mapping->setPointer(this->data[child].id, &(this->data[posCur]));
 			mapping->setPointer(this->data[posCur].id, &(this->data[child]));
-			node temp = this->data[posCur]; //switch with last position		
+			node temp = this->data[posCur]; 
 			this->data[posCur] = this->data[child];
 			this->data[child] = temp;
 		}
@@ -130,20 +128,5 @@ void heap::percolateDown(int posCur){
 int heap::getPos(node *pn){
 	int pos = pn - &data[0];
 	return pos;
-}
-
-
-void heap::printData(){ // delete before submitting
-	//cout<<"filled: "<<this->filled<<endl;
-	for( int i = 0; i<this->data.size(); i++){
-		if(this->data[i].key == 0)
-			continue;
-		//cout<<"position in table: "<<i<<endl;
-		//cout<<"id:\t"<<this->data[i].id<<endl;
-		//cout<<"key:\t"<<this->data[i].key<<endl;
-		//cout<<"pdata:\t"<<this->data[i].pData<<endl;
-		//cout<<"address:\t"<<&(this->data[i])<<endl;
-		//cout<<" "<<endl; 		
-	}
 }
 
