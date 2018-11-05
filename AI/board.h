@@ -8,6 +8,7 @@ using namespace std;
 class Board;
 class Piece;
 class Move;
+class Player;
 
 class Piece{
 public:
@@ -17,13 +18,40 @@ public:
 	int y;
 	char color;
 	bool alive = true;
+	bool isKing = false;
 	string name;
+};
+
+class Player{
+public:
+	char color;
+	vector<Piece*> pieces;
+	vector<Move> getMoves();
+	Player(Piece* p1, Piece* p2,Piece* p3,Piece* p4,Piece* p5,Piece* p6,
+		Piece* p7,Piece* p8,Piece* p9,Piece* p10,Piece* p11,Piece* p12,char color): color(color){
+		this->pieces.resize(12);
+		this->pieces[0] = p1;
+		this->pieces[1] = p2;
+		this->pieces[2] = p3;
+		this->pieces[3] = p4;
+		this->pieces[4] = p5;
+		this->pieces[5] = p6;
+		this->pieces[6] = p7;
+		this->pieces[7] = p8;
+		this->pieces[8] = p9;
+		this->pieces[9] = p10;
+		this->pieces[10] = p11;
+		this->pieces[11] = p12;
+		
+
+	}
 };
 
 class Board{
 
 public:
-	Piece 	p1 = Piece(0,0,'r',"p1"), 
+	
+	Piece	p1 = Piece(0,0,'r',"p1"),  // X is row, Y is col
 		p2 = Piece(0,2,'r',"p2"), 
 		p3 = Piece(0,4,'r',"p3"), 
 		p4 = Piece(0,6,'r',"p4"), 
@@ -47,34 +75,15 @@ public:
 		p22 = Piece(5,3,'w',"p22"), 
 		p23 = Piece(5,5,'w',"p23"), 
 		p24 = Piece(5,7,'w',"p24");
-
-
-	
-	//Piece p1, p2, p3, p4, p5, p6 ,p7, p8, p9, p10, p11, p12, p13, p14,p15, p16;
-	/*Board(): 	p1(0, 0, 'w', "p1"), 
-			p2(0, 0, 'w', "p1"), 
-			p3(0, 0, 'w', "p1"), 
-			p4(0, 0, 'w', "p1"), 
-			p5(0, 0, 'w', "p1"), 
-			p6(0, 0, 'w', "p1"), 
-			p7(0, 0, 'w', "p1"), 
-			p8(0, 0, 'w', "p1"), 
-			p9(0, 0, 'w', "p1"), 
-			p10(0, 0, 'w', "p1"), 
-			p11(0, 0, 'w', "p1"), 
-			p12(0, 0, 'w', "p1"), 
-			p13(0, 0, 'w', "p1"), 
-			p14(0, 0, 'w', "p1"), 
-			p15(0, 0, 'w', "p1"), 
-			p16(0, 0, 'w', "p1"){};
-	*/
-
+	vector<Move> getMoves(char player);
+	Player* player2;
+	Player* player1;
+	Player* myTurn;
+	Player* opponent;
 	Board(){
-		//cout<<"assigning addresses"<<endl;
 		pieces.resize(8);
 		for(int i = 0; i<8; i++)
 			pieces[i].resize(8);
-		//cout<<"address of p1 = "<<&p1<<endl;
 		pieces[0][0] = &p1;
 		pieces[0][2] = &p2;
 		pieces[0][4] = &p3;
@@ -99,16 +108,24 @@ public:
 		pieces[5][3] = &p22;
 		pieces[5][5] = &p23;
 		pieces[5][7] = &p24;
+		player1 = new Player(&p1,&p2,&p3,&p4,&p5,&p6,
+					&p7,&p8,&p9,&p10,&p11,&p12, 'r');
+		player2 = new Player(&p13, &p14, &p15, &p16, &p17, &p18, 
+					&p19, &p20, &p21, &p22, &p23, &p24,'w');
+		myTurn = player1;
+		opponent = player2;	
 		cout<<"done with addresses"<<endl;
-		
-
-
+		cout<<"myturn: "<<myTurn<<", player1: "<<player1<<endl;
 	};
 	void showBoard();
+	void loadBoard();
+	void playGame();
+	void executeMove(Move move);
 	vector< vector<Piece*> > pieces;
+
 private:
 
-};
+}; // End of Board class
 
 
 class Move{
@@ -117,6 +134,13 @@ public:
 	int yOld;
 	int xNew;
 	int yNew;
+	int xCap = 0;
+	int yCap = 0;
+	bool capMove = false;
+	Move(int x1, int y1, int x2, int y2): xOld(x1), yOld(y1), xNew(x2), yNew(y2){this->capMove = false;}
+	Move(int x1, int y1, int x2, int y2, int x3, int y3): xOld(x1), yOld(y1), xNew(x2), yNew(y2), xCap(x3), yCap(y3){this->capMove = true;}
 };
+
+
 
 #endif
