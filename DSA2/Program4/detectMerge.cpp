@@ -3,102 +3,70 @@
 #include <fstream>
 using namespace std;
 
-string detectMerge(string A, string B, string C){
-	int lenA = A.length();
-	int lenB = B.length();
-	bool matches[lenA+1][lenB+1] = {false};
-	int A_spots[lenA] = {0}, slot = 0;
-	for(int i = 0; i <= lenA; i++){
-		for(int j = 0; j <= lenB; j++){
+bool matches[1001][1001] = {false}; //global array of booleans
+int path[1001] = {0}; // used to find indices for letters to highlight
 
-			cout<<"i: "<<i<<", j: "<<j<<endl;
-			// two empty strings have an empty string 
-            		// as interleaving 
-			if (i==0 && j==0) 
-		                matches[i][j] = true; 
-  
-			// A is empty 
-			else if (i==0 && B[j-1]==C[j-1]) 
-        		        matches[i][j] = matches[i][j-1]; 
-  
-			// B is empty 
-			else if (j==0 && A[i-1]==C[i-1]){
-				matches[i][j] = matches[i-1][j]; 
-				//A_spots[slot++] = i+j-1;
-			}
-  
-			// Current character of C matches with current character of A, 
-			// but doesn't match with current character of B 
-			else if(A[i-1]==C[i+j-1] && B[j-1]!=C[i+j-1]){
-				matches[i][j] = matches[i-1][j]; 
-				//A_spots[slot++] = i+j-1;
-			}
+bool match(const string A, const string B, const string C, int i, int j){
+	return ((matches[i-1][j] && (C[i+j-1] == A[i-1])) || (matches[i][j-1] && (C[i+j-1] == B[j-1]))); 
+}
 
-			// Current character of C matches with current character of B, 
-			// but doesn't match with current character of A 
-			else if (A[i-1]!=C[i+j-1] && B[j-1]==C[i+j-1]) 
-				matches[i][j] = matches[i][j-1]; 
-  
-			// Current character of C matches with that of both A and B 
-			else if (A[i-1]==C[i+j-1] && B[j-1]==C[i+j-1]){
-				matches[i][j]=(matches[i-1][j] || matches[i][j-1]) ; 
-				//A_spots[slot++] = i+j-1;
-			}
-
-		}
-	}
-	//int A_spots[lenA] = {0}, slot = 0;
-	/*for(int i = 1 ;i<= lenA; i++){
-		int true_in_row = 0;
-		for(int j = 0; j <= lenB; j++){
-			if((i>0 || j > 0) && (true_in_row % 2 == 0) && matches[i][j]){
-				true_in_row++;
-				A_spots[slot++] = i+j-1;
-			}
-		}
-	}
-	*/
+void getPath(const string A, const string B){
+	int i = A.length(), j = B.length(), slot = 0;
 	
-	for(int i = 1 ;i<= lenA; i++){
-		int true_in_row = 0;
-		for(int j = 0; j <= lenB; j++){
-			if((i>0 || j > 0) && true_in_row==0 && matches[i][j]){
-				true_in_row++;
-				A_spots[slot++] = i+j-1;
-			}
+	while(i >0  || j> 0){
+		if(matches[i-1][j] && !matches[i][j-1]&& i-1>=0){ // upward motions indicate letter from first string
+			i--;
+			path[slot++] = i+j;
 		}
+		else if(matches[i][j-1] && j-1>=0) // sideways motions indicate letter from second string
+			j--;			
 	}
-	cout<<"================================="<<endl;
-	for(int i =0 ; i<=lenA ; i++){
-		for(int j =0 ; j<= lenB; j++){
-			if(matches[i][j])
-				cout<<"T";
-			else
-				cout<<"_";
-		}
-		cout<<endl;
-	}
-	if(!matches[lenA][lenB])
-		return "***NOT A MERGE***";
+}
 
-	//for(int i =0 ;i <lenA; i++ )
-	//	cout<<A_spots[i]<<endl;
+string detectMerge(const string A, const string B, const string C){
+	if(A.length() + B.length() != C.length())
+		return "*** NOT A MERGE ***";
+	for(int i =0 ; i<1001; i++){ // clear the arrays
+		path[i] = 0;
+		for(int j =0 ; j<1001; j++)
+			matches[i][j] = false;
+	}
+	matches[0][0] = true; // starting point
+	for(int i =0; i<= A.length(); i++){ // fill in the array recursively by checking previous values
+		for(int j =0; j<= B.length(); j++){
+			if(!i && !j)
+				continue;
+			matches[i][j] = match(A, B, C, i,j);
+		}
+	}
+
+	if(!matches[A.length()][B.length()]) // the string are not a merge
+		return "*** NOT A MERGE ***";
+	getPath(A, B); // indices in merged string to highlight 
 	string result = C;
-	for(int i=0 ;i <lenA; i++)
-		result[A_spots[i]] = toupper(result[A_spots[i]]);
+	for(int i = 0 ;i < A.length(); i++){
+		result[path[i]] = toupper(result[path[i]]); // returns correctly formatted string, highlighting letters from string A
+	}
 	return result;
 }
 
 int main(){
-	string s = "hellow world";
-	cout<<s<<endl;
-	//cout<<"first letter of s: "<<s[-1]<<endl;
-
-	//cout<<detectMerge("abbc", "abab", "ababbcab")<<endl;
-	cout<<detectMerge("zzzzzzzzzzzzzzzzzzzzab", "zzzzzzzzzzzzzzzzzzzzac", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzacab")<<endl;
-	//cout<<detectMerge("ab", "ba", "abab")<<endl;
-	//cout<<detectMerge("choco", "late", "latechoco")<<endl;
-		//cout<<"found a merge"<<endl;
+	string in_name, out_name;
+	cout<<"Enter name of input file: ";
+	cin>>in_name;
+	cout<<"Enter name of output file: ";
+	cin>>out_name;
+	ifstream infile;
+	ofstream outfile;
+	infile.open(in_name);
+	outfile.open(out_name);	
+	string A, B, C;
+	while(infile>>A>>B>>C){
+		outfile<<detectMerge(A,B,C)<<endl; // runs the algorithm
+	}
+	//outfile<<endl; // fixes newline issue at end of file
+	infile.close();
+	outfile.close();
 	return 0;
 }
 
